@@ -210,6 +210,10 @@ $(document).ready(function(){
 		});
 	}
 	
+	function <portlet:namespace/>clearSearchTermSelector() {
+		// what gonna do here?
+	}
+	
 	$('#<portlet:namespace/>btnSearchHistories').click(function(event){
 		advancedSearch.selectSearchHistory( $('#<portlet:namespace/>mainPagination' ) );
 	});

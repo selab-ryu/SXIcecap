@@ -33,6 +33,9 @@
 	
 	Ticket ticket = TicketLocalServiceUtil.addTicket(user.getCompanyId(), User.class.getName(), user.getUserId(), TicketConstants.TYPE_IMPERSONATE, null, null, new ServiceContext());
 	
+	long subjectId =  ParamUtil.getLong(renderRequest, "subjectId", 0);
+	String baseURL = (String)renderRequest.getAttribute("baseURL");
+	
 	Calendar today = Calendar.getInstance(locale);
 %>
 
@@ -57,6 +60,12 @@
 %>
 
 <portlet:actionURL name="<%= IcecapMVCCommands.ACTION_STRUCTURED_DATA_ADD %>" var="saveActionURL">
+	<portlet:param name="<%= StationXWebKeys.CMD %>" value="<%= command %>"/>
+</portlet:actionURL>
+
+<portlet:actionURL name="/temp/saveCRF" var="tempSaveActionURL">
+	<portlet:param name="subjectId" value="<%= String.valueOf(subjectId) %>"/>
+	<portlet:param name="baseURL" value="<%= baseURL %>"/>
 	<portlet:param name="<%= StationXWebKeys.CMD %>" value="<%= command %>"/>
 </portlet:actionURL>
 
@@ -92,7 +101,7 @@
 				
 				<div id="<portlet:namespace/>editorPanel"></div>
 				
-				<form action="<%= saveActionURL.toString() %>" name="<portlet:namespace/>fm" id="<portlet:namespace/>fm" method="post">
+				<form action="<%= tempSaveActionURL.toString() %>" name="<portlet:namespace/>fm" id="<portlet:namespace/>fm" method="post">
 					<input type="hidden" id="<portlet:namespace/>dataTypeId" name="<portlet:namespace/>dataTypeId" value="<%= dataType.getDataTypeId() %>" >
 					<input type="hidden" id="<portlet:namespace/>structuredDataId" name="<portlet:namespace/>structuredDataId" value="<%= structuredDataId %>" >
 					<input type="hidden" id="<portlet:namespace/>dataContent" name="<portlet:namespace/>dataContent" >

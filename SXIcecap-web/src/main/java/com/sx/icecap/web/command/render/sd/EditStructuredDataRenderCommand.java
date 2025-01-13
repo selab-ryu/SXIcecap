@@ -86,6 +86,9 @@ public class EditStructuredDataRenderCommand implements MVCRenderCommand {
 		
 		renderRequest.setAttribute(IcecapWebKeys.DATA_STRUCTURE, dataStructure);
 		
+		String baseURL = ParamUtil.getString(renderRequest, "baseURL");
+		renderRequest.setAttribute("baseURL", baseURL);
+		
 		return IcecapJsps.STRUCTURED_DATA_EDIT;
 	}
 	
