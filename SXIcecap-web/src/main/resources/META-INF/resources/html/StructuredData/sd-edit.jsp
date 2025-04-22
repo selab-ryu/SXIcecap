@@ -219,7 +219,7 @@ $(document).ready(function(){
 		$('#<portlet:namespace/>dataTypeId').val(  recvPacket.payload.dataTypeId );
 		$('#<portlet:namespace/>structuredDataId').val( recvPacket.payload.structuredDataId );
 		$('#<portlet:namespace/>dataContent').val( recvPacket.payload.content );
-		console.log( 'dataContent: ', $('#<portlet:namespace/>dataContent').val() );
+		//console.log( 'dataContent: ', $('#<portlet:namespace/>dataContent').val() );
 	});
 
 	$('#<portlet:namespace/>btnSave').on( 'click', function(event){

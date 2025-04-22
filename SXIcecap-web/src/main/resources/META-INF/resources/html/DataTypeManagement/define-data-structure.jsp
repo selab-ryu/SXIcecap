@@ -541,8 +541,8 @@ $(document).ready(function(){
 			},
 			success: function( result ){
 				$.confirm({
-					title: 'request-success',
-					content: 'data-structure-saved',
+					title: '<liferay-ui:message key="request-success"/>',
+					content: '<liferay-ui:message key="data-structure-saved"/>',
 					type: 'orange',
 					typeAnimated: true,
 					draggable: true,
