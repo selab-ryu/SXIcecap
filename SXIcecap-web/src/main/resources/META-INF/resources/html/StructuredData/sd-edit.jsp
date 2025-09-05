@@ -214,7 +214,7 @@ $(document).ready(function(){
 		let recvPacket = evt.dataPacket;
 		if( !recvPacket.isTargetPortlet( '<portlet:namespace/>') )	return;
 		
-		console.log( 'SX_VISUALIZER_DATA_CHANGED: ',  recvPacket );
+		//console.log( 'SX_VISUALIZER_DATA_CHANGED: ',  recvPacket );
 		
 		$('#<portlet:namespace/>dataTypeId').val(  recvPacket.payload.dataTypeId );
 		$('#<portlet:namespace/>structuredDataId').val( recvPacket.payload.structuredDataId );
