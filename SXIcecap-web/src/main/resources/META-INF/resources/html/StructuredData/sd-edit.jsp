@@ -124,7 +124,12 @@ $(document).ready(function(){
 			<%= jsonLocales.toJSONString() %> );
 
 	let dataStructure = <%= dataStructure %>;
-	let structuredData = <%= Validator.isNotNull(structuredData) %> ? JSON.parse('<%= structuredData %>') : null;
+	
+	let sdJsonStr = '<%= structuredData %>';
+	// for new line character
+	let escapedString = sdJsonStr.replace(/\n/g, "\\n").replace(/\r/g, "\\r");
+	//console.log("escaped", escapedString);
+	let structuredData = <%= Validator.isNotNull(structuredData) %> ? JSON.parse(escapedString) : null;
 	
 	let sdeInfo;
 	

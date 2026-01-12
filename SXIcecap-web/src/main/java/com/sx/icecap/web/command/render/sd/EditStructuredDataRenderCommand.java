@@ -21,6 +21,8 @@ import com.sx.icecap.model.StructuredData;
 import com.sx.icecap.service.DataTypeLocalService;
 import com.sx.icecap.service.StructuredDataLocalService;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -80,6 +82,11 @@ public class EditStructuredDataRenderCommand implements MVCRenderCommand {
 		}
 		else {
 			String structuredData  = _dataTypeLocalService.getStructuredData(structuredDataId);
+			
+			// 260106 : add download url to file term value
+			// set file download URL
+			structuredData = _setFileTermDownloadURL(dataStructure, structuredData);
+			
 			renderRequest.setAttribute(IcecapWebKeys.STRUCTURED_DATA, structuredData);
 			renderRequest.setAttribute(StationXWebKeys.CMD, StationXConstants.CMD_UPDATE);
 		}
@@ -90,6 +97,86 @@ public class EditStructuredDataRenderCommand implements MVCRenderCommand {
 		renderRequest.setAttribute("baseURL", baseURL);
 		
 		return IcecapJsps.STRUCTURED_DATA_EDIT;
+	}
+	
+	// 260106 : add download url to file term value
+	private String _setFileTermDownloadURL(String dataStructure, String structuredData) throws PortletException {
+		
+		// change string to json object (dataStrcuture, structuredData)
+		JSONObject jsonDataStructure = null;
+		JSONObject jsonStructuredData = null;
+		
+		try {
+			jsonDataStructure = JSONFactoryUtil.createJSONObject(dataStructure);
+			jsonStructuredData = JSONFactoryUtil.createJSONObject(structuredData);
+		} 
+		catch( Exception e ) {
+			e.printStackTrace();
+			return structuredData;
+		}
+		
+		// retrieval datastructure
+		JSONArray terms = jsonDataStructure.getJSONArray("terms");
+		Set<String> keySet = jsonStructuredData.keySet();
+		for( int i=0; i<terms.length(); i++ ) {
+			JSONObject term = terms.getJSONObject(i);
+			String termName = term.getString("termName");
+			if( keySet.contains( termName ) ) {
+				// check file term
+				String termType = term.getString("termType");
+				if( termType.equalsIgnoreCase("File") ) {
+					JSONObject folderInfo = jsonStructuredData.getJSONObject(termName);
+					if( Validator.isNull(folderInfo) ) {
+						System.out.println("Term "+termName+" has no folder information");
+					}
+					else if( folderInfo.length() == 0 ){
+						System.out.println("Term "+termName+" has empty information.");
+					}
+					else {
+						// loop folder info by file count
+						List<FileEntry> fileEntries = new ArrayList<>();
+						Iterator<String> it = folderInfo.keys();
+						while(it.hasNext()) {
+							String fileName = it.next();
+							JSONObject fileObj = folderInfo.getJSONObject(fileName);
+							long fileId = fileObj.getLong("fileId");
+							
+							// get file entry by file id
+							if(fileId > 0) {
+								FileEntry entry = null;
+								try {
+									entry = _dlAppService.getFileEntry(fileId);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+								// 260107 : if file entry not exist 
+								if(Validator.isNotNull(entry))
+									fileEntries.add(entry);
+							}
+						}
+						
+						// add download url to structured data
+						for( FileEntry fileEntry : fileEntries ) {
+							JSONObject fileInfo = JSONFactoryUtil.createJSONObject();
+							fileInfo.put("parentFolderId", fileEntry.getFolderId() );
+							fileInfo.put("repositoryId", fileEntry.getRepositoryId() );
+							fileInfo.put("fileId", fileEntry.getFileEntryId() );
+							fileInfo.put("name", fileEntry.getFileName() );
+							fileInfo.put("size", fileEntry.getSize() );
+							fileInfo.put("type", fileEntry.getMimeType() );
+							fileInfo.put("downloadURL", "/documents/" + fileEntry.getGroupId() + StringPool.SLASH + fileEntry.getFolderId() + StringPool.SLASH + fileEntry.getFileName() + StringPool.SLASH + fileEntry.getUuid() );
+							
+							folderInfo.put( fileEntry.getFileName(), fileInfo);
+						}
+					}
+				}
+			}
+		}
+		
+		// change json object to string
+		String result = jsonStructuredData.toJSONString();
+		
+		return result;
 	}
 	
 	/*
